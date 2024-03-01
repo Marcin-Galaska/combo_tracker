@@ -332,7 +332,7 @@ mod:hook_safe("ActionSweep", "start", function(self, action_settings, t, time_sc
     end
 
     local melee_attack_strengths = AttackSettings.melee_attack_strength
-    local damage_profile = self._damage_profile
+    local damage_profile = action_settings.damage_profile
 
     mod._is_heavy = damage_profile.melee_attack_strength == melee_attack_strengths.heavy
     mod._show_active_and_next = true
@@ -375,7 +375,6 @@ mod:hook_safe("ActionSweep", "finish", function(self, reason, data, t, time_in_a
         mod._current_attack = 0
     end
 
-    -- mod:notify(reason)
     mod._show_active_and_next = false
 end)
 
@@ -400,9 +399,18 @@ end)
 
 local max_push_time = 0.7
 mod:hook_safe("ActionHandler", "start_action", function (self, id, action_objects, action_name, action_params, action_settings, used_input, t, transition_type, condition_func_params, automatic_input, reset_combo_override)
-    local is_action_melee = string.find(action_name, "action_melee") ~= nil
+    local is_action_windup = string.find(action_name, "action_melee") ~= nil
+    if not (
+        string.find(action_name, "action_melee") or
+        string.find(action_name, "action_left") or
+        string.find(action_name, "action_right") or
+        string.find(action_name, "action_heavy") or
+        string.find(action_name, "action_light")
+    ) then
+        mod._current_attack = 0
+    end
 
-    if is_action_melee and mod._last_action_name == "action_push" then
+    if is_action_windup and mod._last_action_name == "action_push" then
         if t - mod._last_action_t < max_push_time then
             mod._push_follow_up = true
         else
@@ -423,4 +431,3 @@ mod:hook(CLASS.UIHud, "init", function(func, self, elements, visibility_groups, 
 
 	return func(self, elements, visibility_groups, params, ...)
 end)
-
