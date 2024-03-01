@@ -18,14 +18,17 @@ local Patterns = mod:io_dofile("combo_tracker/scripts/mods/combo_tracker/combo_t
 
 mod._is_melee = false
 mod._is_heavy = false
+mod._push_follow_up = false
 mod._show_active_and_next = false
 mod._should_draw_widget = true
 mod._next_light = 0
 mod._next_heavy = 0
 mod._current_attack = 0
+mod._last_action_t = 0
 mod._primary_attack_chain = {}
 mod._secondary_attack_chain = {}
 mod._weapon_name = ""
+mod._last_action_name = ""
 
 mod._combo_tracker_widget_fade_inout_speed = mod:get("combo_tracker_widget_fade_inout_speed")
 mod._combo_tracker_widget_only_in_training_grounds = mod:get("combo_tracker_widget_only_in_training_grounds")
@@ -344,6 +347,16 @@ mod:hook_safe("ActionSweep", "start", function(self, action_settings, t, time_sc
         mod._current_attack = 1
     end
 
+    if mod._push_follow_up == true then
+        if mod._is_heavy then
+            mod._current_attack = mod._next_heavy
+        else
+            mod._current_attack = mod._next_light
+        end
+
+        mod._push_follow_up = false
+    end
+
     if string.len(mod._weapon_name) > 0 and not mod._is_heavy then
         mod._next_light = Patterns[mod._weapon_name].light[mod._current_attack].light
         mod._next_heavy = Patterns[mod._weapon_name].light[mod._current_attack].heavy
@@ -364,6 +377,41 @@ mod:hook_safe("ActionSweep", "finish", function(self, reason, data, t, time_in_a
 
     -- mod:notify(reason)
     mod._show_active_and_next = false
+end)
+
+mod:hook_safe("ActionPush", "start", function(self, ...)
+    if not mod._is_melee then
+        return
+    end
+
+    mod._current_attack = 0
+    mod._next_light = Patterns[mod._weapon_name].push.light
+    mod._next_heavy = Patterns[mod._weapon_name].push.heavy
+    mod._show_active_and_next = true
+end)
+
+mod:hook_safe("ActionPush", "finish", function(self, ...)
+    if not mod._is_melee then
+        return
+    end
+
+    mod._show_active_and_next = false
+end)
+
+local max_push_time = 0.7
+mod:hook_safe("ActionHandler", "start_action", function (self, id, action_objects, action_name, action_params, action_settings, used_input, t, transition_type, condition_func_params, automatic_input, reset_combo_override)
+    local is_action_melee = string.find(action_name, "action_melee") ~= nil
+
+    if is_action_melee and mod._last_action_name == "action_push" then
+        if t - mod._last_action_t < max_push_time then
+            mod._push_follow_up = true
+        else
+            mod._push_follow_up = false
+        end
+    end
+
+    mod._last_action_name = action_name
+    mod._last_action_t = t
 end)
 
 -- Add hud element to hud
