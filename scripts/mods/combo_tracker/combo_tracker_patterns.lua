@@ -380,7 +380,7 @@ return {
             heavy = 2
         },
         on_special = function(action_name)
-            if mod._current_attack % 2 == 0 then
+            if mod._current_attack % 2 == 0 or mod._current_attack == -1 then
                 return {
                     light = 1,
                     heavy = 1
@@ -427,7 +427,7 @@ return {
             heavy = 2
         },
         on_special = function(action_name)
-            if mod._current_attack % 2 == 0 then
+            if mod._current_attack % 2 == 0 or mod._current_attack == -1 then
                 return {
                     light = 1,
                     heavy = 1
@@ -1265,7 +1265,6 @@ return {
             light = 1,
             heavy = 1
         },
-        -- TODO
         on_special = function(action_name)
             if action_name == "action_activate_special_left" then
                 return {
@@ -1314,7 +1313,24 @@ return {
             light = 2,
             heavy = 3
         },
-        -- TODO
+        on_special = function(action_name)
+            if action_name == "action_activate_special_left" then
+                return {
+                    light = 1,
+                    heavy = 1
+                }
+            elseif action_name == "action_activate_special_right" then
+                return {
+                    light = 2,
+                    heavy = 2
+                }
+            elseif action_name == "action_activate_special_left_2" then
+                return {
+                    light = 1,
+                    heavy = 3
+                }
+            end
+        end
     },
     [prefix .. "ogryn_club_p1_m1"] = {
         light = {

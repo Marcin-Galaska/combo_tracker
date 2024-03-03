@@ -359,8 +359,8 @@ mod:hook_safe("ActionSweep", "start", function(self, action_settings, t, time_sc
     end
 
     if string.len(mod._weapon_name) > 0 and not mod._is_heavy then
-        mod._next_light = Patterns[mod._weapon_name].light[mod._current_attack]["light"]
-        mod._next_heavy = Patterns[mod._weapon_name].light[mod._current_attack]["heavy"]
+        mod._next_light = Patterns[mod._weapon_name].light[mod._current_attack].light
+        mod._next_heavy = Patterns[mod._weapon_name].light[mod._current_attack].heavy
     elseif string.len(mod._weapon_name) > 0 and mod._is_heavy then
         mod._next_light = Patterns[mod._weapon_name].heavy[mod._current_attack].light
         mod._next_heavy = Patterns[mod._weapon_name].heavy[mod._current_attack].heavy
@@ -372,7 +372,7 @@ mod:hook_safe("ActionSweep", "finish", function(self, reason, data, t, time_in_a
         return
     end
 
-    if reason == "action_complete" then
+    if reason == "action_complete" or reason == "stunned" then
         mod._current_attack = 0
     end
 
@@ -395,6 +395,10 @@ mod:hook_safe("ActionPush", "finish", function(self, ...)
         return
     end
 
+    mod._show_active_and_next = false
+end)
+
+mod:hook_safe("ActionActivateSpecial", "finish", function (self, reason, data, t, time_in_action)
     mod._show_active_and_next = false
 end)
 
