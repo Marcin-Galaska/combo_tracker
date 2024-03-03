@@ -378,7 +378,20 @@ return {
         push = {
             light = 2,
             heavy = 2
-        }
+        },
+        on_special = function(action_name)
+            if mod._current_attack % 2 == 0 then
+                return {
+                    light = 1,
+                    heavy = 1
+                }
+            else
+                return {
+                    light = 2,
+                    heavy = 2
+                }
+            end
+        end
     },
     [prefix .. "powersword_p1_m2"] = {
         light = {
@@ -412,7 +425,20 @@ return {
         push = {
             light = 2,
             heavy = 2
-        }
+        },
+        on_special = function(action_name)
+            if mod._current_attack % 2 == 0 then
+                return {
+                    light = 1,
+                    heavy = 1
+                }
+            else
+                return {
+                    light = 2,
+                    heavy = 2
+                }
+            end
+        end
     },
     [prefix .. "forcesword_p1_m1"] = {
         light = {
