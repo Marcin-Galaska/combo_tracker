@@ -5,6 +5,22 @@ local mod = get_mod("combo_tracker")
 
 local prefix = "content/items/weapons/player/melee/"
 
+local is_combatknife_p1_m2_heavy_3_follow_up = false
+local combatknife_p1_m2_heavy_3_next_pattern = function()
+    if is_combatknife_p1_m2_heavy_3_follow_up == true then
+        is_combatknife_p1_m2_heavy_3_follow_up = false
+        return {
+            light = 4,
+            heavy = 2
+        }
+    else
+        return {
+            light = 1,
+            heavy = 1
+        }
+    end
+end
+
 return {
     [prefix .. "combatsword_p1_m1"] = {
         light = {
@@ -818,7 +834,7 @@ return {
             },
             [3] = {
                 light = 2,
-                heavy = 1
+                heavy = 2
             }
         },
         push = {
@@ -1010,12 +1026,6 @@ return {
             heavy = 1
         },
         -- TODO
-        -- on_special = function(action_name)
-        --     return {
-        --         light = 1,
-        --         heavy = 1
-        --     }
-        -- end
     },
     [prefix .. "combataxe_p3_m3"] = {
         light = {
@@ -1051,12 +1061,6 @@ return {
             heavy = 1
         },
         -- TODO
-        -- on_special = function(action_name)
-        --     return {
-        --         light = 1,
-        --         heavy = 1
-        --     }
-        -- end
     },
     [prefix .. "chainaxe_p1_m1"] = {
         light = {
@@ -1090,7 +1094,13 @@ return {
         push = {
             light = 2,
             heavy = 2
-        }
+        },
+        on_special = function(action_name)
+            return {
+                light = 1,
+                heavy = 1
+            }
+        end
     },
     [prefix .. "chainaxe_p1_m2"] = {
         light = {
@@ -1116,7 +1126,13 @@ return {
         push = {
             light = 2,
             heavy = 2
-        }
+        },
+        on_special = function(action_name)
+            return {
+                light = 1,
+                heavy = 1
+            }
+        end
     },
     [prefix .. "combatknife_p1_m1"] = {
         light = {
@@ -1144,7 +1160,7 @@ return {
             },
             [2] = {
                 light = 3,
-                heavy = 3
+                heavy = 1
             }
         },
         push = {
@@ -1186,15 +1202,18 @@ return {
                 light = 4,
                 heavy = 3
             },
-            [3] = {
-                light = 1,
-                heavy = 1
-            }
+            [3] = combatknife_p1_m2_heavy_3_next_pattern()
         },
         push = {
             light = 2,
             heavy = 2
-        }
+        }, -- Shit's bad, gotta come up with something, this ain't working
+        on_special = function(action_name)
+            is_combatknife_p1_m2_heavy_3_follow_up = true
+            return {
+                heavy = 3
+            }
+        end
     },
     [prefix .. "powermaul_2h_p1_m1"] = {
         light = {
@@ -1400,7 +1419,8 @@ return {
         push = {
             light = 1,
             heavy = 1
-        }
+        },
+        -- TODO
     },
     [prefix .. "ogryn_club_p1_m3"] = {
         light = {
@@ -1434,7 +1454,8 @@ return {
         push = {
             light = 1,
             heavy = 1
-        }
+        },
+        -- TODO
     },
     [prefix .. "ogryn_club_p2_m1"] = {
         light = {
@@ -1733,9 +1754,11 @@ return {
             light = 1,
             heavy = 1
         },
-        -- TODO
         on_special = function(action_name)
-            return {}
+            return {
+                light = 1,
+                heavy = 1
+            }
         end
     }
 }

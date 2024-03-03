@@ -358,12 +358,14 @@ mod:hook_safe("ActionSweep", "start", function(self, action_settings, t, time_sc
         mod._push_follow_up = false
     end
 
-    if string.len(mod._weapon_name) > 0 and not mod._is_heavy then
-        mod._next_light = Patterns[mod._weapon_name].light[mod._current_attack].light
-        mod._next_heavy = Patterns[mod._weapon_name].light[mod._current_attack].heavy
-    elseif string.len(mod._weapon_name) > 0 and mod._is_heavy then
-        mod._next_light = Patterns[mod._weapon_name].heavy[mod._current_attack].light
-        mod._next_heavy = Patterns[mod._weapon_name].heavy[mod._current_attack].heavy
+    if string.len(mod._weapon_name) > 0 then
+        if not mod._is_heavy then
+            mod._next_light = Patterns[mod._weapon_name].light[mod._current_attack].light
+            mod._next_heavy = Patterns[mod._weapon_name].light[mod._current_attack].heavy
+        else
+            mod._next_light = Patterns[mod._weapon_name].heavy[mod._current_attack].light
+            mod._next_heavy = Patterns[mod._weapon_name].heavy[mod._current_attack].heavy
+        end
     end
 end)
 
@@ -372,7 +374,19 @@ mod:hook_safe("ActionSweep", "finish", function(self, reason, data, t, time_in_a
         return
     end
 
-    if reason == "action_complete" or reason == "stunned" then
+    if reason == "action_complete" or reason == "stunned" or reason == "started_sprint" then
+        mod._current_attack = 0
+    end
+
+    mod._show_active_and_next = false
+end)
+
+mod:hook_safe("ActionBlock", "finish", function(self, reason, data, t, time_in_action)
+    if not mod._is_melee then
+        return
+    end
+
+    if reason == "hold_input_released" then
         mod._current_attack = 0
     end
 
@@ -404,13 +418,16 @@ end)
 
 local max_push_time = 0.7
 mod:hook_safe("ActionHandler", "start_action", function (self, id, action_objects, action_name, action_params, action_settings, used_input, t, transition_type, condition_func_params, automatic_input, reset_combo_override)
+    if mod._weapon_name == "" then
+        return
+    end
+
     local is_action_windup = string.find(action_name, "action_melee") ~= nil
-    local is_turtolsky_special_follow_up = string.find(action_name, "special_2") and string.find(mod._weapon_name, "combatsword_p2")
+    local is_turtolsky_special_follow_up = string.find(mod._weapon_name, "combatsword_p2") and string.find(action_name, "special_2")
 
     if  string.find(action_name, "special") and
         not is_turtolsky_special_follow_up and -- Turtolsky exception (is_heavy calculation for Turtolsky Mk VI and VII swords is still broken)
-        Patterns[mod._weapon_name].on_special and
-        Patterns[mod._weapon_name].on_special(action_name) ~= {}
+        Patterns[mod._weapon_name].on_special
     then
         mod._on_special_result = Patterns[mod._weapon_name].on_special(action_name)
         mod._next_light = mod._on_special_result.light

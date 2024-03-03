@@ -76,9 +76,23 @@ HudElementCombo._draw_icons = function (self, dt, t, ui_renderer)
 	local x_offset = spacing * (#primary_attack_chain - 1) * 0.5
 
 	for i = #mod._primary_attack_chain, 1, -1 do
-		if i == mod._current_attack and mod._show_active_and_next and not mod._is_heavy then
+		if
+			i == mod._current_attack and
+			mod._show_active_and_next and
+			not mod._is_heavy
+		then
 			widget_primary.style.combo_icon_primary.color = mod._combo_tracker_widget_active_appearance
-		elseif i == mod._next_light and mod._show_active_and_next and mod._combo_tracker_widget_show_next_attacks then
+		elseif
+			mod._combo_tracker_widget_show_next_attacks and
+			i == mod._next_light and
+			mod._show_active_and_next
+		then
+			widget_primary.style.combo_icon_primary.color = mod._combo_tracker_widget_next_appearance
+		elseif
+			mod._combo_tracker_widget_show_next_attacks and
+			i == 1 and
+			mod._current_attack == 0
+		then
 			widget_primary.style.combo_icon_primary.color = mod._combo_tracker_widget_next_appearance
 		else
 			widget_primary.style.combo_icon_primary.color = mod._combo_tracker_widget_default_appearance
@@ -96,9 +110,23 @@ HudElementCombo._draw_icons = function (self, dt, t, ui_renderer)
 	x_offset = spacing * (#secondary_attack_chain - 1) * 0.5
 
 	for i = #mod._secondary_attack_chain, 1, -1 do
-		if i == mod._current_attack and mod._show_active_and_next and mod._is_heavy then
+		if 
+			i == mod._current_attack and
+			mod._show_active_and_next and
+			mod._is_heavy 
+		then
 			widget_secondary.style.combo_icon_secondary.color = mod._combo_tracker_widget_active_appearance
-		elseif i == mod._next_heavy and mod._show_active_and_next and mod._combo_tracker_widget_show_next_attacks then
+		elseif
+			mod._combo_tracker_widget_show_next_attacks and
+			i == mod._next_heavy and
+			mod._show_active_and_next
+		then
+			widget_secondary.style.combo_icon_secondary.color = mod._combo_tracker_widget_next_appearance
+		elseif
+			mod._combo_tracker_widget_show_next_attacks and
+			i == 1 and
+			mod._current_attack == 0
+		then
 			widget_secondary.style.combo_icon_secondary.color = mod._combo_tracker_widget_next_appearance
 		else
 			widget_secondary.style.combo_icon_secondary.color = mod._combo_tracker_widget_default_appearance
