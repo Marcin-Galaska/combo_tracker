@@ -27,6 +27,7 @@ mod._current_attack = 0
 mod._last_action_t = 0
 mod._primary_attack_chain = {}
 mod._secondary_attack_chain = {}
+mod._on_special_result = {}
 mod._weapon_name = ""
 mod._last_action_name = ""
 
@@ -358,8 +359,8 @@ mod:hook_safe("ActionSweep", "start", function(self, action_settings, t, time_sc
     end
 
     if string.len(mod._weapon_name) > 0 and not mod._is_heavy then
-        mod._next_light = Patterns[mod._weapon_name].light[mod._current_attack].light
-        mod._next_heavy = Patterns[mod._weapon_name].light[mod._current_attack].heavy
+        mod._next_light = Patterns[mod._weapon_name].light[mod._current_attack]["light"]
+        mod._next_heavy = Patterns[mod._weapon_name].light[mod._current_attack]["heavy"]
     elseif string.len(mod._weapon_name) > 0 and mod._is_heavy then
         mod._next_light = Patterns[mod._weapon_name].heavy[mod._current_attack].light
         mod._next_heavy = Patterns[mod._weapon_name].heavy[mod._current_attack].heavy
@@ -400,17 +401,32 @@ end)
 local max_push_time = 0.7
 mod:hook_safe("ActionHandler", "start_action", function (self, id, action_objects, action_name, action_params, action_settings, used_input, t, transition_type, condition_func_params, automatic_input, reset_combo_override)
     local is_action_windup = string.find(action_name, "action_melee") ~= nil
+    local is_turtolsky_special_follow_up = string.find(action_name, "special_2") and string.find(mod._weapon_name, "combatsword_p2")
+
+    if  string.find(action_name, "special") and
+        not is_turtolsky_special_follow_up and -- Turtolsky exception (is_heavy calculation for Turtolsky Mk VI and VII swords is still broken)
+        Patterns[mod._weapon_name].on_special and
+        Patterns[mod._weapon_name].on_special(action_name) ~= {}
+    then
+        mod._on_special_result = Patterns[mod._weapon_name].on_special(action_name)
+        mod._next_light = mod._on_special_result.light
+        mod._next_heavy = mod._on_special_result.heavy
+        mod._current_attack = -1
+        mod._show_active_and_next = true
+    end
+
     if not (
         string.find(action_name, "action_melee") or
         string.find(action_name, "action_left") or
         string.find(action_name, "action_right") or
         string.find(action_name, "action_heavy") or
-        string.find(action_name, "action_light")
+        string.find(action_name, "action_light") or
+        string.find(action_name, "special")
     ) then
         mod._current_attack = 0
     end
 
-    if is_action_windup and mod._last_action_name == "action_push" then
+    if is_action_windup == true and mod._last_action_name == "action_push" then
         if t - mod._last_action_t < max_push_time then
             mod._push_follow_up = true
         else
