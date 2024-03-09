@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 1.0.0
+-- Combo Tracker mod by mroużon. Ver. 2.0.0
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -8,7 +8,6 @@ local mod = get_mod("combo_tracker")
 -- ##################################################
 
 local WeaponTemplate = require("scripts/utilities/weapon/weapon_template")
-local AttackSettings = require("scripts/settings/damage/attack_settings")
 
 local Patterns = mod:io_dofile("combo_tracker/scripts/mods/combo_tracker/combo_tracker_patterns")
 
@@ -16,20 +15,17 @@ local Patterns = mod:io_dofile("combo_tracker/scripts/mods/combo_tracker/combo_t
 -- Mod variables
 -- ##################################################
 
-mod._is_melee = false
-mod._is_heavy = false
-mod._push_follow_up = false
-mod._show_active_and_next = false
-mod._should_draw_widget = true
-mod._next_light = 0
-mod._next_heavy = 0
-mod._current_attack = 0
-mod._last_action_t = 0
-mod._primary_attack_chain = {}
-mod._secondary_attack_chain = {}
-mod._on_special_result = {}
-mod._weapon_name = ""
-mod._last_action_name = ""
+mod._is_melee = false                                               -- Whether the player currently wields a melee weapon
+mod._should_draw_widget = true                                      -- Whether the widget should be drawn
+mod._primary_attack_chain = {}                                      -- Table of light attack combo icons
+mod._secondary_attack_chain = {}                                    -- Table of heavy attack combo icons
+mod._weapon_actions = {}                                            -- Table of relevant actions of current melee weapon
+mod._light_sweeps = {}                                              -- Table of light attack combo action names
+mod._heavy_sweeps = {}                                              -- Table of heavy attack combo action names
+mod._weapon_name = ""                                               -- Name of currently drawn melee weapon
+mod._current_action = ""                                            -- Name of current action
+mod._next_light = ""                                                -- Name of predicted next light attack action
+mod._next_heavy = ""                                                -- Name of predicted next heavy attack action
 
 mod._combo_tracker_widget_fade_inout_speed = mod:get("combo_tracker_widget_fade_inout_speed")
 mod._combo_tracker_widget_only_in_training_grounds = mod:get("combo_tracker_widget_only_in_training_grounds")
@@ -61,13 +57,6 @@ mod._combo_tracker_widget_frame_appearance = {
     mod:get("combo_tracker_widget_frame_B")
 }
 
-mod._weapon_action_type_icons = {
-    ["tank"] = "content/ui/materials/icons/weapons/actions/tank",
-    ["ninja_fencer"] = "content/ui/materials/icons/weapons/actions/ninjafencer",
-    ["linesman"] = "content/ui/materials/icons/weapons/actions/linesman",
-    ["smiter"] = "content/ui/materials/icons/weapons/actions/smiter"
-}
-
 local hud_element_script = "combo_tracker/scripts/mods/combo_tracker/hud/hud_element_combo"
 local hud_element_class = "HudElementCombo"
 
@@ -88,6 +77,20 @@ local init = function(func, ...)
     if func then
         func(...)
     end
+end
+
+mod.reset_logic_variables = function()
+    mod._is_melee = false
+    mod._should_draw_widget = true
+    mod._primary_attack_chain = {}
+    mod._secondary_attack_chain = {}
+    mod._weapon_actions = {}
+    mod._light_sweeps = {}
+    mod._heavy_sweeps = {}
+    mod._weapon_name = ""
+    mod._current_action = ""
+    mod._next_light = ""
+    mod._next_heavy = ""
 end
 
 mod.recreate_hud = function(self)
@@ -283,7 +286,8 @@ end
 
 mod.player_unit_destroyed = function(self, player_unit)
 	if player_unit == mod.player_unit then
-        -- TODO
+        mod.reset_logic_variables()
+        mod.initialized = false
 	end
 end
 
@@ -291,10 +295,50 @@ end
 -- Custom functions
 -- ##################################################
 
+local _handle_weapon_pattern = function(weapon_actions, primary_attack_chain_length, secondary_attack_chain_length)
+    mod._light_sweeps = {}
+    mod._heavy_sweeps = {}
+
+    local actions = weapon_actions
+    local current_windup = actions[actions["default"]]
+
+    for i = 1, primary_attack_chain_length, 1 do
+        mod._light_sweeps[i] = current_windup.allowed_chain_actions.light_attack.action_name
+        current_windup = actions[actions[mod._light_sweeps[i]].allowed_chain_actions.start_attack.action_name]
+    end
+
+    current_windup = actions[actions["default"]]
+
+    for i = 1, secondary_attack_chain_length, 1 do
+        mod._heavy_sweeps[i] = current_windup.allowed_chain_actions.heavy_attack.action_name
+        current_windup = actions[actions[mod._heavy_sweeps[i]].allowed_chain_actions.start_attack.action_name]
+    end
+end
+
+local _handle_next_attacks = function(current_action)
+    if not mod._weapon_actions[current_action] then
+        current_action = mod._weapon_actions["default"]
+    end
+
+    local allowed_chain_actions = mod._weapon_actions[current_action].allowed_chain_actions
+    if allowed_chain_actions.start_attack then
+        local action_windup = mod._weapon_actions[allowed_chain_actions.start_attack.action_name]
+        mod._next_light = action_windup.allowed_chain_actions.light_attack.action_name
+        mod._next_heavy = action_windup.allowed_chain_actions.heavy_attack.action_name
+    elseif allowed_chain_actions.light_attack and allowed_chain_actions.heavy_attack then
+        mod._next_light = allowed_chain_actions.light_attack.action_name
+        mod._next_heavy = allowed_chain_actions.heavy_attack.action_name
+    else
+        mod._next_light = ""
+        mod._next_heavy = ""
+    end
+end
+
 -- ##################################################
 -- Hooks
 -- ##################################################
 
+-- Get melee weapon data and set pattern tables
 mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slot_name, t, skip_wield_action)
     if mod._combo_tracker_widget_only_in_training_grounds == true then
         local game_mode_name = Managers.state.game_mode:game_mode_name()
@@ -309,154 +353,52 @@ mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slo
 
 	mod._is_melee = weapon_template and WeaponTemplate.is_melee(weapon_template)
 
-    if weapon_template and mod._is_melee then
-        mod._should_draw_widget = true
-        mod._primary_attack_chain = weapon_template.displayed_attacks.primary.attack_chain
-        mod._secondary_attack_chain = weapon_template.displayed_attacks.secondary.attack_chain
+    if not mod._is_melee then
+        mod._should_draw_widget = false
+        return
     end
+
+    mod._should_draw_widget = true
+    mod._primary_attack_chain = weapon_template.displayed_attacks.primary.attack_chain
+    mod._secondary_attack_chain = weapon_template.displayed_attacks.secondary.attack_chain
 
     local combo_element = mod.get_hud_element()
     if combo_element then
         combo_element:set_background_size(#mod._primary_attack_chain, #mod._secondary_attack_chain)
     end
 
-    if mod._is_melee then
-        local weapon = self._weapons[slot_name]
-	    local weapon_item = weapon.item
-        mod._weapon_name = weapon_item.name
-    end
+    local weapon = self._weapons[slot_name]
+	local weapon_item = weapon.item
+
+    mod._weapon_name = weapon_item.name
+    mod._weapon_actions = Patterns[mod._weapon_name]
+
+    _handle_weapon_pattern(mod._weapon_actions, #mod._primary_attack_chain, #mod._secondary_attack_chain)
 end)
 
-mod:hook_safe("ActionSweep", "start", function(self, action_settings, t, time_scale, action_start_params)
-    if not mod._is_melee then
-        return
-    end
-
-    local melee_attack_strengths = AttackSettings.melee_attack_strength
-    local damage_profile = action_settings.damage_profile
-
-    mod._is_heavy = damage_profile.melee_attack_strength == melee_attack_strengths.heavy
-    mod._show_active_and_next = true
-
-    if mod._current_attack ~= 0 then
-        if mod._is_heavy then
-            mod._current_attack = mod._next_heavy
-        else
-            mod._current_attack = mod._next_light
-        end
-    else
-        mod._current_attack = 1
-    end
-
-    if mod._push_follow_up == true then
-        if mod._is_heavy then
-            mod._current_attack = mod._next_heavy
-        else
-            mod._current_attack = mod._next_light
-        end
-
-        mod._push_follow_up = false
-    end
-
-    if string.len(mod._weapon_name) > 0 then
-        if not mod._is_heavy then
-            mod._next_light = Patterns[mod._weapon_name].light[mod._current_attack].light
-            mod._next_heavy = Patterns[mod._weapon_name].light[mod._current_attack].heavy
-        else
-            mod._next_light = Patterns[mod._weapon_name].heavy[mod._current_attack].light
-            mod._next_heavy = Patterns[mod._weapon_name].heavy[mod._current_attack].heavy
-        end
-    end
-end)
-
-mod:hook_safe("ActionSweep", "finish", function(self, reason, data, t, time_in_action)
-    if not mod._is_melee then
-        return
-    end
-
-    if reason == "action_complete" or reason == "stunned" or reason == "started_sprint" then
-        mod._current_attack = 0
-    end
-
-    mod._show_active_and_next = false
-end)
-
-mod:hook_safe("ActionBlock", "finish", function(self, reason, data, t, time_in_action)
-    if not mod._is_melee then
-        return
-    end
-
-    if reason == "hold_input_released" then
-        mod._current_attack = 0
-    end
-
-    mod._show_active_and_next = false
-end)
-
-mod:hook_safe("ActionPush", "start", function(self, ...)
-    if not mod._is_melee then
-        return
-    end
-
-    mod._current_attack = 0
-    mod._next_light = Patterns[mod._weapon_name].push.light
-    mod._next_heavy = Patterns[mod._weapon_name].push.heavy
-    mod._show_active_and_next = true
-end)
-
-mod:hook_safe("ActionPush", "finish", function(self, ...)
-    if not mod._is_melee then
-        return
-    end
-
-    mod._show_active_and_next = false
-end)
-
-mod:hook_safe("ActionActivateSpecial", "finish", function (self, reason, data, t, time_in_action)
-    mod._show_active_and_next = false
-end)
-
-local max_push_time = 0.7
+-- Update current action
 mod:hook_safe("ActionHandler", "start_action", function (self, id, action_objects, action_name, action_params, action_settings, used_input, t, transition_type, condition_func_params, automatic_input, reset_combo_override)
-    if mod._weapon_name == "" then
+    if not mod._is_melee or not mod._weapon_name or mod._weapon_name == "" then
         return
     end
 
-    local is_action_windup = string.find(action_name, "action_melee") ~= nil
-    local is_turtolsky_special_follow_up = string.find(mod._weapon_name, "combatsword_p2") and string.find(action_name, "special_2")
+    mod._current_action = action_name
+    _handle_next_attacks(action_name)
+end)
 
-    if  string.find(action_name, "special") and
-        not is_turtolsky_special_follow_up and -- Turtolsky exception (is_heavy calculation for Turtolsky Mk VI and VII swords is still broken)
-        Patterns[mod._weapon_name].on_special
+-- Reset current action
+mod:hook_safe("ActionHandler", "_finish_action", function (self, handler_data, reason, data, t, next_action_params)
+    if not mod._is_melee or mod._current_action == "combat_ability" then
+        return
+    end
+
+    if  reason == "action_complete" and mod._weapon_actions[mod._current_action] and mod._weapon_actions[mod._current_action].kind == "sweep" or
+        reason == "started_sprint" or
+        not mod._weapon_actions[mod._current_action]
     then
-        mod._on_special_result = Patterns[mod._weapon_name].on_special(action_name)
-        mod._next_light = mod._on_special_result.light
-        mod._next_heavy = mod._on_special_result.heavy
-        mod._current_attack = -1
-        mod._show_active_and_next = true
+        mod._current_action = mod._weapon_actions["default"]
+        _handle_next_attacks(mod._current_action)
     end
-
-    if not (
-        string.find(action_name, "action_melee") or
-        string.find(action_name, "action_left") or
-        string.find(action_name, "action_right") or
-        string.find(action_name, "action_heavy") or
-        string.find(action_name, "action_light") or
-        string.find(action_name, "special")
-    ) then
-        mod._current_attack = 0
-    end
-
-    if is_action_windup == true and mod._last_action_name == "action_push" then
-        if t - mod._last_action_t < max_push_time then
-            mod._push_follow_up = true
-        else
-            mod._push_follow_up = false
-        end
-    end
-
-    mod._last_action_name = action_name
-    mod._last_action_t = t
 end)
 
 -- Add hud element to hud
@@ -467,4 +409,9 @@ mod:hook(CLASS.UIHud, "init", function(func, self, elements, visibility_groups, 
 	end
 
 	return func(self, elements, visibility_groups, params, ...)
+end)
+
+-- Reset on game session end
+mod:hook_safe("StateGameplay", "on_exit", function(self, on_shutdown)
+    mod.reset_logic_variables()
 end)

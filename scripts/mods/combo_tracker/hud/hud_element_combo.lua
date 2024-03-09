@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 1.0.0
+-- Combo Tracker mod by mroużon. Ver. 2.0.0
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -7,11 +7,16 @@ local Definitions = mod:io_dofile("combo_tracker/scripts/mods/combo_tracker/hud/
 local Settings = mod:io_dofile("combo_tracker/scripts/mods/combo_tracker/hud/hud_element_combo_settings")
 
 local UIWidget = mod:original_require("scripts/managers/ui/ui_widget")
-local UIHudSettings = mod:original_require("scripts/settings/ui/ui_hud_settings")
 
 local HudElementCombo = class("HudElementCombo", "HudElementBase")
 
 local gauge_spacing = Settings.gauge_spacing
+local weapon_action_type_icons = {
+    ["tank"] = "content/ui/materials/icons/weapons/actions/tank",
+    ["ninja_fencer"] = "content/ui/materials/icons/weapons/actions/ninjafencer",
+    ["linesman"] = "content/ui/materials/icons/weapons/actions/linesman",
+    ["smiter"] = "content/ui/materials/icons/weapons/actions/smiter"
+}
 
 HudElementCombo.on_resolution_modified = function (self)
 	HudElementCombo.super.on_resolution_modified(self)
@@ -76,29 +81,15 @@ HudElementCombo._draw_icons = function (self, dt, t, ui_renderer)
 	local x_offset = spacing * (#primary_attack_chain - 1) * 0.5
 
 	for i = #mod._primary_attack_chain, 1, -1 do
-		if
-			i == mod._current_attack and
-			mod._show_active_and_next and
-			not mod._is_heavy
-		then
+		if mod._light_sweeps[i] == mod._current_action then
 			widget_primary.style.combo_icon_primary.color = mod._combo_tracker_widget_active_appearance
-		elseif
-			mod._combo_tracker_widget_show_next_attacks and
-			i == mod._next_light and
-			mod._show_active_and_next
-		then
-			widget_primary.style.combo_icon_primary.color = mod._combo_tracker_widget_next_appearance
-		elseif
-			mod._combo_tracker_widget_show_next_attacks and
-			i == 1 and
-			mod._current_attack == 0
-		then
+		elseif mod._combo_tracker_widget_show_next_attacks and mod._light_sweeps[i] == mod._next_light then
 			widget_primary.style.combo_icon_primary.color = mod._combo_tracker_widget_next_appearance
 		else
 			widget_primary.style.combo_icon_primary.color = mod._combo_tracker_widget_default_appearance
 		end
 
-		widget_primary.content.combo_icon_primary = mod._weapon_action_type_icons[mod._primary_attack_chain[i]]
+		widget_primary.content.combo_icon_primary = weapon_action_type_icons[mod._primary_attack_chain[i]]
 		widget_primary.offset[1] = x_offset
 
 		UIWidget.draw(widget_primary, ui_renderer)
@@ -110,29 +101,15 @@ HudElementCombo._draw_icons = function (self, dt, t, ui_renderer)
 	x_offset = spacing * (#secondary_attack_chain - 1) * 0.5
 
 	for i = #mod._secondary_attack_chain, 1, -1 do
-		if 
-			i == mod._current_attack and
-			mod._show_active_and_next and
-			mod._is_heavy 
-		then
+		if mod._heavy_sweeps[i] == mod._current_action then
 			widget_secondary.style.combo_icon_secondary.color = mod._combo_tracker_widget_active_appearance
-		elseif
-			mod._combo_tracker_widget_show_next_attacks and
-			i == mod._next_heavy and
-			mod._show_active_and_next
-		then
-			widget_secondary.style.combo_icon_secondary.color = mod._combo_tracker_widget_next_appearance
-		elseif
-			mod._combo_tracker_widget_show_next_attacks and
-			i == 1 and
-			mod._current_attack == 0
-		then
+		elseif mod._combo_tracker_widget_show_next_attacks and mod._heavy_sweeps[i] == mod._next_heavy then
 			widget_secondary.style.combo_icon_secondary.color = mod._combo_tracker_widget_next_appearance
 		else
 			widget_secondary.style.combo_icon_secondary.color = mod._combo_tracker_widget_default_appearance
 		end
 
-		widget_secondary.content.combo_icon_secondary = mod._weapon_action_type_icons[mod._secondary_attack_chain[i]]
+		widget_secondary.content.combo_icon_secondary = weapon_action_type_icons[mod._secondary_attack_chain[i]]
 		widget_secondary.offset[1] = x_offset
 
 		UIWidget.draw(widget_secondary, ui_renderer)
