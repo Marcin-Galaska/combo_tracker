@@ -1,6 +1,7 @@
 return {
     ["is_foldable_shovel"] = true,
     ["default"] = "action_melee_start_left",
+	["folded_default"] = "action_melee_start_left_special",
     ["action_melee_start_left"] = {
         name = "action_melee_start_left",
         kind = "windup",

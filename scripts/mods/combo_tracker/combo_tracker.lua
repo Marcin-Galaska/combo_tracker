@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 2.0.0
+-- Combo Tracker mod by mroużon. Ver. 2.0.1
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -26,6 +26,9 @@ mod._weapon_name = ""                                               -- Name of c
 mod._current_action = ""                                            -- Name of current action
 mod._next_light = ""                                                -- Name of predicted next light attack action
 mod._next_heavy = ""                                                -- Name of predicted next heavy attack action
+
+mod._is_foldable_shovel = false                                     -- Whether the currently drawn melee weapon is a foldable shovel
+mod._is_foldable_shovel_folded = false                              -- Whether the currently drawn foldable shovel weapon is folded
 
 mod._combo_tracker_widget_fade_inout_speed = mod:get("combo_tracker_widget_fade_inout_speed")
 mod._combo_tracker_widget_only_in_training_grounds = mod:get("combo_tracker_widget_only_in_training_grounds")
@@ -315,22 +318,49 @@ local _handle_weapon_pattern = function(weapon_actions, primary_attack_chain_len
     end
 end
 
-local _handle_next_attacks = function(current_action)
+local _handle_next_attacks = function(current_action, is_foldable_shovel, is_foldable_shovel_folded)
     if not mod._weapon_actions[current_action] then
         current_action = mod._weapon_actions["default"]
     end
 
     local allowed_chain_actions = mod._weapon_actions[current_action].allowed_chain_actions
-    if allowed_chain_actions.start_attack then
-        local action_windup = mod._weapon_actions[allowed_chain_actions.start_attack.action_name]
-        mod._next_light = action_windup.allowed_chain_actions.light_attack.action_name
-        mod._next_heavy = action_windup.allowed_chain_actions.heavy_attack.action_name
-    elseif allowed_chain_actions.light_attack and allowed_chain_actions.heavy_attack then
-        mod._next_light = allowed_chain_actions.light_attack.action_name
-        mod._next_heavy = allowed_chain_actions.heavy_attack.action_name
+
+    if not is_foldable_shovel then
+        if allowed_chain_actions.start_attack then
+            local action_windup = mod._weapon_actions[allowed_chain_actions.start_attack.action_name]
+            mod._next_light = action_windup.allowed_chain_actions.light_attack.action_name
+            mod._next_heavy = action_windup.allowed_chain_actions.heavy_attack.action_name
+        elseif allowed_chain_actions.light_attack and allowed_chain_actions.heavy_attack then
+            mod._next_light = allowed_chain_actions.light_attack.action_name
+            mod._next_heavy = allowed_chain_actions.heavy_attack.action_name
+        else
+            mod._next_light = ""
+            mod._next_heavy = ""
+        end
     else
-        mod._next_light = ""
-        mod._next_heavy = ""
+        if allowed_chain_actions.start_attack then
+            if string.find(current_action, "special") or current_action == "action_push" then
+                if is_foldable_shovel_folded == true then
+                    local action_windup = mod._weapon_actions[allowed_chain_actions.start_attack[1].action_name]
+                    mod._next_light = action_windup.allowed_chain_actions.light_attack.action_name
+                    mod._next_heavy = action_windup.allowed_chain_actions.heavy_attack.action_name
+                else
+                    local action_windup = mod._weapon_actions[allowed_chain_actions.start_attack[2].action_name]
+                    mod._next_light = action_windup.allowed_chain_actions.light_attack.action_name
+                    mod._next_heavy = action_windup.allowed_chain_actions.heavy_attack.action_name
+                end
+            else
+                local action_windup = mod._weapon_actions[allowed_chain_actions.start_attack.action_name]
+                mod._next_light = action_windup.allowed_chain_actions.light_attack.action_name
+                mod._next_heavy = action_windup.allowed_chain_actions.heavy_attack.action_name
+            end
+        elseif allowed_chain_actions.light_attack and allowed_chain_actions.heavy_attack then
+            mod._next_light = allowed_chain_actions.light_attack.action_name
+            mod._next_heavy = allowed_chain_actions.heavy_attack.action_name
+        else
+            mod._next_light = ""
+            mod._next_heavy = ""
+        end
     end
 end
 
@@ -340,6 +370,7 @@ end
 
 -- Get melee weapon data and set pattern tables
 mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slot_name, t, skip_wield_action)
+    -- Determine widget visibility
     if mod._combo_tracker_widget_only_in_training_grounds == true then
         local game_mode_name = Managers.state.game_mode:game_mode_name()
         if game_mode_name ~= "shooting_range" then
@@ -348,6 +379,7 @@ mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slo
         end
     end
 
+    -- Calculate _is_melee
     local weapon_action_component = self._weapon_action_component
     local weapon_template = weapon_action_component and WeaponTemplate.current_weapon_template(weapon_action_component)
 
@@ -355,9 +387,11 @@ mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slo
 
     if not mod._is_melee then
         mod._should_draw_widget = false
+        mod._is_foldable_shovel = false
         return
     end
 
+    -- Set widget look
     mod._should_draw_widget = true
     mod._primary_attack_chain = weapon_template.displayed_attacks.primary.attack_chain
     mod._secondary_attack_chain = weapon_template.displayed_attacks.secondary.attack_chain
@@ -367,12 +401,22 @@ mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slo
         combo_element:set_background_size(#mod._primary_attack_chain, #mod._secondary_attack_chain)
     end
 
+    -- Get weapon name and action patterns
     local weapon = self._weapons[slot_name]
 	local weapon_item = weapon.item
 
     mod._weapon_name = weapon_item.name
     mod._weapon_actions = Patterns[mod._weapon_name]
 
+    -- Handle foldable shovels
+    if mod._weapon_actions["is_foldable_shovel"] and mod._weapon_actions["is_foldable_shovel"] == true then
+        mod._is_foldable_shovel = true
+    else
+        mod._is_foldable_shovel = false
+    end
+    mod._if_foldable_shovel_folded = false
+
+    -- Handle action patterns
     _handle_weapon_pattern(mod._weapon_actions, #mod._primary_attack_chain, #mod._secondary_attack_chain)
 end)
 
@@ -383,22 +427,54 @@ mod:hook_safe("ActionHandler", "start_action", function (self, id, action_object
     end
 
     mod._current_action = action_name
-    _handle_next_attacks(action_name)
+
+    -- Handle foldable shovels
+    if mod._is_foldable_shovel then
+        if  not (
+            string.find(action_name, "heavy") or
+            string.find(action_name, "light") or
+            string.find(action_name, "special")
+            )
+        then
+            return
+        elseif action_name == "action_special_activate" then
+            mod._is_foldable_shovel_folded = not mod._is_foldable_shovel_folded
+        elseif string.find(action_name, "special") and mod._weapon_actions[mod._current_action].kind == "sweep" then
+            mod._is_foldable_shovel_folded = true
+        end
+    else
+        mod._is_foldable_shovel_folded = false
+    end
+
+    -- Determine possible next attacks
+    _handle_next_attacks(action_name, mod._is_foldable_shovel, mod._is_foldable_shovel_folded)
 end)
 
 -- Reset current action
 mod:hook_safe("ActionHandler", "_finish_action", function (self, handler_data, reason, data, t, next_action_params)
-    if not mod._is_melee or mod._current_action == "combat_ability" then
+    if not mod._is_melee then
         return
     end
 
+    -- Set action to default after quitting melee fighting
     if  reason == "action_complete" and mod._weapon_actions[mod._current_action] and mod._weapon_actions[mod._current_action].kind == "sweep" or
         reason == "started_sprint" or
         not mod._weapon_actions[mod._current_action]
     then
-        mod._current_action = mod._weapon_actions["default"]
-        _handle_next_attacks(mod._current_action)
+        if mod._is_foldable_shovel and mod._is_foldable_shovel_folded and mod._weapon_actions["folded_default"] then
+            mod._current_action = mod._weapon_actions["folded_default"]
+        else
+            mod._current_action = mod._weapon_actions["default"]
+        end
+
+        _handle_next_attacks(mod._current_action, mod._is_foldable_shovel, mod._is_foldable_shovel_folded)
     end
+end)
+
+-- Reset _is_foldable_shovel_folded on successful hit (Class typo by the devs lmao)
+mod:hook_safe("WeaponSpeciaShovels", "process_hit", function (self, t, weapon, action_settings, num_hit_enemies, target_is_alive, target_unit, hit_position, attack_direction, abort_attack, optional_origin_slot)
+    mod._is_foldable_shovel_folded = false
+    _handle_next_attacks(mod._current_action, mod._is_foldable_shovel, mod._is_foldable_shovel_folded)
 end)
 
 -- Add hud element to hud
