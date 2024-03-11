@@ -179,7 +179,7 @@ return {
 						tooltip = "combo_tracker_widget_vertical_offset_desc",
 						type = "numeric",
 						default_value = 0,
-						range = {-250, 750}
+						range = {-790, 125}
 					},
 					{
 						setting_id = "combo_tracker_widget_horizontal_offset",
