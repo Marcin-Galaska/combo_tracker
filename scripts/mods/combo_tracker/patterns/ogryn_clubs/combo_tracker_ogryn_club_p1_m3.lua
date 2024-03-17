@@ -231,6 +231,26 @@ return {
 			}
         }
     },
+	["action_block"] = {
+		name = "action_block",
+        kind = "block",
+		allowed_chain_actions = {
+			start_attack = {
+				{
+					action_name = "action_melee_start_left_special",
+					chain_time = 0.5
+				},
+				{
+					action_name = "action_melee_start_left",
+					chain_time = 0.5
+				}
+			},
+			special_action = {
+				action_name = "action_special_activate",
+				chain_time = 0.3
+			}
+		}
+	},
     ["action_special_activate"] = {
         name = "action_special_activate",
         kind = "toggle_special",

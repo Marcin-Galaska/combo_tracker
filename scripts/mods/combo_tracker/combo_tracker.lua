@@ -339,7 +339,7 @@ local _handle_next_attacks = function(current_action, is_foldable_shovel, is_fol
         end
     else
         if allowed_chain_actions.start_attack then
-            if string.find(current_action, "special") or current_action == "action_push" then
+            if string.find(current_action, "special") or current_action == "action_push" or current_action == "action_block" then
                 if is_foldable_shovel_folded == true then
                     local action_windup = mod._weapon_actions[allowed_chain_actions.start_attack[1].action_name]
                     mod._next_light = action_windup.allowed_chain_actions.light_attack.action_name
@@ -368,50 +368,6 @@ end
 -- Hooks
 -- ##################################################
 
--- On spawn data acquisition
-mod:hook_safe("PlayerUnitWeaponExtension", "on_wieldable_slot_equipped", function (self, item, slot_name, weapon_unit, fx_sources, t, optional_existing_unit_3p, from_server_correction_occurred)
-    -- Determine widget visibility
-    if mod._combo_tracker_widget_only_in_training_grounds == true then
-        local game_mode_name = Managers.state.game_mode:game_mode_name()
-        if game_mode_name ~= "shooting_range" then
-            mod._should_draw_widget = false
-            return
-        end
-    end
-
-    -- Calculate _is_melee
-    local weapon_action_component = self._weapon_action_component
-    local weapon_template = weapon_action_component and WeaponTemplate.current_weapon_template(weapon_action_component)
-	local is_melee = weapon_template and WeaponTemplate.is_melee(weapon_template)
-
-    if not is_melee then
-        return
-    end
-
-    -- Set widget look
-    mod._should_draw_widget = true
-    mod._primary_attack_chain = is_melee and weapon_template.displayed_attacks.primary.attack_chain
-    mod._secondary_attack_chain = is_melee and weapon_template.displayed_attacks.secondary.attack_chain
-
-    local combo_element = mod.get_hud_element()
-    if combo_element then
-        combo_element:set_background_size(#mod._primary_attack_chain, #mod._secondary_attack_chain)
-    end
-
-    -- Get weapon name and action patterns
-    local weapon = self._weapons["slot_primary"]
-	local weapon_item = weapon.item
-
-    mod._weapon_name = weapon_item.name
-    mod._weapon_actions = Patterns[mod._weapon_name]
-
-    -- Handle foldable shovels
-    mod._is_foldable_shovel_folded = false
-
-    -- Handle action patterns
-    _handle_weapon_pattern(mod._weapon_actions, #mod._primary_attack_chain, #mod._secondary_attack_chain)
-end)
-
 -- Get melee weapon data and set pattern tables
 mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slot_name, t, skip_wield_action)
     -- Determine widget visibility
@@ -429,6 +385,7 @@ mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slo
 
 	mod._is_melee = weapon_template and WeaponTemplate.is_melee(weapon_template)
 
+    -- Return when not in melee
     if not mod._is_melee then
         mod._should_draw_widget = false
         mod._is_foldable_shovel = false
@@ -470,6 +427,7 @@ mod:hook_safe("ActionHandler", "start_action", function (self, id, action_object
         return
     end
 
+    -- Update current action
     mod._current_action = action_name
 
     -- Handle foldable shovels
@@ -477,16 +435,11 @@ mod:hook_safe("ActionHandler", "start_action", function (self, id, action_object
         if  not (
             string.find(action_name, "heavy") or
             string.find(action_name, "light") or
-            string.find(action_name, "special")
+            string.find(action_name, "special") or
+            action_name == "action_block"
             )
         then
-            if action_name == "action_block" then
-                if not mod._is_foldable_shovel_folded then
-                    mod._current_action = mod._weapon_actions["default"]
-                end
-            else
-                return
-            end
+            return
         elseif action_name == "action_special_activate" then
             mod._is_foldable_shovel_folded = not mod._is_foldable_shovel_folded
         elseif string.find(action_name, "special") and mod._weapon_actions[mod._current_action].kind == "sweep" then
