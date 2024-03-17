@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 2.0.1a
+-- Combo Tracker mod by mroużon. Ver. 2.0.2
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -368,6 +368,50 @@ end
 -- Hooks
 -- ##################################################
 
+-- On spawn data acquisition
+mod:hook_safe("PlayerUnitWeaponExtension", "on_wieldable_slot_equipped", function (self, item, slot_name, weapon_unit, fx_sources, t, optional_existing_unit_3p, from_server_correction_occurred)
+    -- Determine widget visibility
+    if mod._combo_tracker_widget_only_in_training_grounds == true then
+        local game_mode_name = Managers.state.game_mode:game_mode_name()
+        if game_mode_name ~= "shooting_range" then
+            mod._should_draw_widget = false
+            return
+        end
+    end
+
+    -- Calculate _is_melee
+    local weapon_action_component = self._weapon_action_component
+    local weapon_template = weapon_action_component and WeaponTemplate.current_weapon_template(weapon_action_component)
+	local is_melee = weapon_template and WeaponTemplate.is_melee(weapon_template)
+
+    if not is_melee then
+        return
+    end
+
+    -- Set widget look
+    mod._should_draw_widget = true
+    mod._primary_attack_chain = is_melee and weapon_template.displayed_attacks.primary.attack_chain
+    mod._secondary_attack_chain = is_melee and weapon_template.displayed_attacks.secondary.attack_chain
+
+    local combo_element = mod.get_hud_element()
+    if combo_element then
+        combo_element:set_background_size(#mod._primary_attack_chain, #mod._secondary_attack_chain)
+    end
+
+    -- Get weapon name and action patterns
+    local weapon = self._weapons["slot_primary"]
+	local weapon_item = weapon.item
+
+    mod._weapon_name = weapon_item.name
+    mod._weapon_actions = Patterns[mod._weapon_name]
+
+    -- Handle foldable shovels
+    mod._is_foldable_shovel_folded = false
+
+    -- Handle action patterns
+    _handle_weapon_pattern(mod._weapon_actions, #mod._primary_attack_chain, #mod._secondary_attack_chain)
+end)
+
 -- Get melee weapon data and set pattern tables
 mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slot_name, t, skip_wield_action)
     -- Determine widget visibility
@@ -414,9 +458,9 @@ mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slo
     else
         mod._is_foldable_shovel = false
     end
-    mod._if_foldable_shovel_folded = false
+    mod._is_foldable_shovel_folded = false
 
-    -- Handle action patterns
+    -- -- Handle action patterns
     _handle_weapon_pattern(mod._weapon_actions, #mod._primary_attack_chain, #mod._secondary_attack_chain)
 end)
 
@@ -436,7 +480,13 @@ mod:hook_safe("ActionHandler", "start_action", function (self, id, action_object
             string.find(action_name, "special")
             )
         then
-            return
+            if action_name == "action_block" then
+                if not mod._is_foldable_shovel_folded then
+                    mod._current_action = mod._weapon_actions["default"]
+                end
+            else
+                return
+            end
         elseif action_name == "action_special_activate" then
             mod._is_foldable_shovel_folded = not mod._is_foldable_shovel_folded
         elseif string.find(action_name, "special") and mod._weapon_actions[mod._current_action].kind == "sweep" then
