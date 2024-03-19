@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 2.0.2
+-- Combo Tracker mod by mroużon. Ver. 2.0.4
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -422,7 +422,7 @@ mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slo
 end)
 
 -- Update current action
-mod:hook_safe("ActionHandler", "start_action", function (self, id, action_objects, action_name, action_params, action_settings, used_input, t, transition_type, condition_func_params, automatic_input, reset_combo_override)
+mod:hook_safe("ActionHandler", "start_action", function(self, id, action_objects, action_name, action_params, action_settings, used_input, t, transition_type, condition_func_params, automatic_input, reset_combo_override)
     if not mod._is_melee or not mod._weapon_name or mod._weapon_name == "" then
         return
     end
@@ -454,13 +454,13 @@ mod:hook_safe("ActionHandler", "start_action", function (self, id, action_object
 end)
 
 -- Reset current action
-mod:hook_safe("ActionHandler", "_finish_action", function (self, handler_data, reason, data, t, next_action_params)
+mod:hook_safe("ActionHandler", "_finish_action", function(self, handler_data, reason, data, t, next_action_params)
     if not mod._is_melee then
         return
     end
 
     -- Set action to default after quitting melee fighting
-    if  reason == "action_complete" and mod._weapon_actions[mod._current_action] and mod._weapon_actions[mod._current_action].kind == "sweep" or
+    if  reason == "action_complete" and mod._weapon_actions[mod._current_action] or
         reason == "started_sprint" or
         not mod._weapon_actions[mod._current_action]
     then
