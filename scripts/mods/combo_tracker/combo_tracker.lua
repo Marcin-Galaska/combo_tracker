@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 2.0.4
+-- Combo Tracker mod by mroużon. Ver. 2.0.5
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -64,6 +64,7 @@ local hud_element_script = "combo_tracker/scripts/mods/combo_tracker/hud/hud_ele
 local hud_element_class = "HudElementCombo"
 
 local combo_hud_element = {
+    use_hud_scale = true,
     filename = hud_element_script,
     class_name = hud_element_class,
     visibility_groups = {

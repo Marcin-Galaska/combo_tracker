@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 2.0.4
+-- Combo Tracker mod by mroużon. Ver. 2.0.5
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -179,14 +179,14 @@ return {
 						tooltip = "combo_tracker_widget_vertical_offset_desc",
 						type = "numeric",
 						default_value = 0,
-						range = {-790, 125}
+						range = {-1325, 675}
 					},
 					{
 						setting_id = "combo_tracker_widget_horizontal_offset",
 						tooltip = "combo_tracker_widget_horizontal_offset_desc",
 						type = "numeric",
 						default_value = 0,
-						range = {-850, 850}
+						range = {-1800, 1800}
 					}
 				}
 			}

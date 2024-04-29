@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 2.0.4
+-- Combo Tracker mod by mroużon. Ver. 2.0.5
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -129,7 +129,7 @@ local combo_icon_primary = UIWidget.create_definition({
 			offset = {
 				0 + mod._combo_tracker_widget_horizontal_offset,
 				0 + mod._combo_tracker_widget_vertical_offset,
-				3,
+				3
 			},
 			color = mod._combo_tracker_widget_default_appearance
 		}
@@ -150,7 +150,7 @@ local combo_icon_secondary = UIWidget.create_definition({
 			offset = {
 				0 + mod._combo_tracker_widget_horizontal_offset,
 				0 + mod._combo_tracker_widget_vertical_offset,
-				3,
+				3
 			},
 			color = mod._combo_tracker_widget_default_appearance
 		}
