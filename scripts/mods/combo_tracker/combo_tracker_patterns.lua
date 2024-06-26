@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 2.0.5
+-- Combo Tracker mod by mroużon. Ver. 2.0.6
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -69,12 +69,24 @@ return {
     [weapon .. "combatknife_p1_m1"] = mod:io_dofile(path .. "combat_knives/combo_tracker_combatknife_p1_m1"),
     -- Catachan Mk VI Combat Blade
     [weapon .. "combatknife_p1_m2"] = mod:io_dofile(path .. "combat_knives/combo_tracker_combatknife_p1_m2"),
+    -- Agni Mk Ia Shock Maul
+    [weapon .. "powermaul_p1_m1"] = mod:io_dofile(path .. "power_mauls/combo_tracker_powermaul_p1_m1"),
+    -- Indignatus Mk III Shock Maul
+    [weapon .. "powermaul_p1_m2"] = mod:io_dofile(path .. "power_mauls/combo_tracker_powermaul_p1_m2"),
+    -- Unadded Power Maul (m3)
+    [weapon .. "powermaul_p1_m3"] = mod:io_dofile(path .. "power_mauls/combo_tracker_powermaul_p1_m3"),
     -- Indignatus Mk IVe Crusher
     [weapon .. "powermaul_2h_p1_m1"] = mod:io_dofile(path .. "power_mauls_2h/combo_tracker_powermaul_2h_p1_m1"),
     -- Crucis Mk II Thunder Hammer
     [weapon .. "thunderhammer_2h_p1_m1"] = mod:io_dofile(path .. "thunder_hammers/combo_tracker_thunderhammer_2h_p1_m1"),
     -- Ironhelm Mk IV Thunder Hammer
     [weapon .. "thunderhammer_2h_p1_m2"] = mod:io_dofile(path .. "thunder_hammers/combo_tracker_thunderhammer_2h_p1_m2"),
+    -- Branx Pickaxe
+    [weapon .. "ogryn_pickaxe_2h_p1_m1"] = mod:io_dofile(path .. "ogryn_axes_2h/combo_tracker_ogryn_pickaxe_2h_p1_m1"),
+    -- Borovian Pickaxe
+    [weapon .. "ogryn_pickaxe_2h_p1_m2"] = mod:io_dofile(path .. "ogryn_axes_2h/combo_tracker_ogryn_pickaxe_2h_p1_m2"),
+    -- Karsolas Pickaxe
+    [weapon .. "ogryn_pickaxe_2h_p1_m3"] = mod:io_dofile(path .. "ogryn_axes_2h/combo_tracker_ogryn_pickaxe_2h_p1_m3"),
     -- Brute-Brainer Mk III Latrine Shovel
     [weapon .. "ogryn_club_p1_m1"] = mod:io_dofile(path .. "ogryn_clubs/combo_tracker_ogryn_club_p1_m1"),
     -- Brute-Brainer Mk XIX Latrine Shovel

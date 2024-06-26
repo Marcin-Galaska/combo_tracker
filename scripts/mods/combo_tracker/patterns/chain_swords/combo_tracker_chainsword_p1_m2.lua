@@ -153,7 +153,7 @@ return {
         kind = "sweep",
         allowed_chain_actions = {
             start_attack = {
-                action_name = "action_melee_start_left",
+                action_name = "action_melee_start_left_2",
                 chain_time = 0.7
             },
             special_action = {
