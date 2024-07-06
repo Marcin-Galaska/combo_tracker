@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 2.0.6
+-- Combo Tracker mod by mroużon. Ver. 2.0.6a
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 -- Chinese localization by deluxghost

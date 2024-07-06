@@ -19,11 +19,11 @@ return {
         kind = "windup",
         allowed_chain_actions = {
 			light_attack = {
-				action_name = "action_left_down_light",
+				action_name = "action_right_diagonal_light",
 				chain_time = 0
 			},
 			heavy_attack = {
-				action_name = "action_left_heavy",
+				action_name = "action_right_heavy",
 				chain_time = 0.35
 			}
         }
