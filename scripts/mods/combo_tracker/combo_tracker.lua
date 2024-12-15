@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 2.0.6a
+-- Combo Tracker mod by mroużon. Ver. 2.0.7
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -416,7 +416,7 @@ mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slo
     else
         mod._is_foldable_shovel = false
     end
-    mod._is_foldable_shovel_folded = false
+    -- mod._is_foldable_shovel_folded = false
 
     -- -- Handle action patterns
     _handle_weapon_pattern(mod._weapon_actions, #mod._primary_attack_chain, #mod._secondary_attack_chain)
@@ -447,7 +447,7 @@ mod:hook_safe("ActionHandler", "start_action", function(self, id, action_objects
             mod._is_foldable_shovel_folded = true
         end
     else
-        mod._is_foldable_shovel_folded = false
+        -- mod._is_foldable_shovel_folded = false
     end
 
     -- Determine possible next attacks
@@ -475,8 +475,8 @@ mod:hook_safe("ActionHandler", "_finish_action", function(self, handler_data, re
     end
 end)
 
--- Reset _is_foldable_shovel_folded on successful hit (Class typo by the devs lmao)
-mod:hook_safe("WeaponSpeciaShovels", "process_hit", function (self, t, weapon, action_settings, num_hit_enemies, target_is_alive, target_unit, hit_position, attack_direction, abort_attack, optional_origin_slot)
+-- Reset _is_foldable_shovel_folded on successful hit
+mod:hook_safe("WeaponSpecialShovels", "process_hit", function (self, t, weapon, action_settings, num_hit_enemies, target_is_alive, target_unit, hit_position, attack_direction, abort_attack, optional_origin_slot)
     mod._is_foldable_shovel_folded = false
     _handle_next_attacks(mod._current_action, mod._is_foldable_shovel, mod._is_foldable_shovel_folded)
 end)

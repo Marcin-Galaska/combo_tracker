@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 2.0.6a
+-- Combo Tracker mod by mroużon. Ver. 2.0.7
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -29,12 +29,20 @@ return {
     [weapon .. "powersword_p1_m1"] = mod:io_dofile(path .. "power_swords/combo_tracker_powersword_p1_m1"),
     -- Munitorum Mk VI Power Sword
     [weapon .. "powersword_p1_m2"] = mod:io_dofile(path .. "power_swords/combo_tracker_powersword_p1_m2"),
+    -- Munitorum Mk X Relic Blade
+    [weapon .. "powersword_2h_p1_m1"] = mod:io_dofile(path .. "power_swords_2h/combo_tracker_powersword_2h_p1_m1"),
+    -- Munitorum Mk II Relic Blade
+    [weapon .. "powersword_2h_p1_m2"] = mod:io_dofile(path .. "power_swords_2h/combo_tracker_powersword_2h_p1_m2"),
     -- Obscurus Mk II Blaze Force Sword
     [weapon .. "forcesword_p1_m1"] = mod:io_dofile(path .. "force_swords/combo_tracker_forcesword_p1_m1"),
     -- Deimos Mk IV Blaze Force Sword
     [weapon .. "forcesword_p1_m2"] = mod:io_dofile(path .. "force_swords/combo_tracker_forcesword_p1_m2"),
     -- Illisi Mk V Blaze Force Sword
     [weapon .. "forcesword_p1_m3"] = mod:io_dofile(path .. "force_swords/combo_tracker_forcesword_p1_m3"),
+    -- Covenant Mk VI Blaze Force Greatsword
+    [weapon .. "forcesword_2h_p1_m1"] = mod:io_dofile(path .. "force_swords_2h/combo_tracker_forcesword_2h_p1_m1"),
+    -- Covenant Mk VIII Blaze Force Greatsword
+    [weapon .. "forcesword_2h_p1_m2"] = mod:io_dofile(path .. "force_swords_2h/combo_tracker_forcesword_2h_p1_m2"),
     -- Cadia Mk IV Assault Chainsword
     [weapon .. "chainsword_p1_m1"] = mod:io_dofile(path .. "chain_swords/combo_tracker_chainsword_p1_m1"),
     -- Cadia Mk XIIIg Assault Chainsword
