@@ -52,6 +52,24 @@ return {
             }
         }
     },
+    ["action_melee_start_special_combo"] = {
+        name = "action_melee_start_special_combo",
+        kind = "windup",
+        allowed_chain_actions = {
+            light_attack = {
+                action_name = "action_right_light_pushfollow",
+                chain_time = 0
+            },
+            heavy_attack = {
+                action_name = "action_left_heavy",
+                chain_time = 0.56
+            },
+            special_action = {
+                action_name = "action_parry_special",
+                chain_time = 0.5
+            }
+        }
+    },
     ["action_left_light"] = {
         name = "action_left_light",
         kind = "sweep",
@@ -177,7 +195,7 @@ return {
         kind = "sweep",
         allowed_chain_actions = {
             start_attack = {
-                action_name = "action_melee_start_left_2",
+                action_name = "action_melee_start_special_combo",
                 chain_time = 0.4
             },
             special_action = {

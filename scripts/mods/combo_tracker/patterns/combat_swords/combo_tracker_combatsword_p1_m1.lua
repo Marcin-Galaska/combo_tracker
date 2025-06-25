@@ -6,11 +6,9 @@ return {
         allowed_chain_actions = {
             light_attack = {
                 action_name = "action_left_light",
-                chain_time = 0
             },
             heavy_attack = {
                 action_name = "action_left_heavy",
-                chain_time = 0.75
             },
             special_action = {
                 action_name = "action_parry_special"
@@ -23,11 +21,9 @@ return {
         allowed_chain_actions = {
             light_attack = {
                 action_name = "action_right_light",
-                chain_time = 0
             },
             heavy_attack = {
                 action_name = "action_right_heavy",
-                chain_time = 0.54
             },
             special_action = {
                 action_name = "action_parry_special"
@@ -40,15 +36,42 @@ return {
         allowed_chain_actions = {
             light_attack = {
                 action_name = "action_left_light_2",
-                chain_time = 0
             },
             heavy_attack = {
                 action_name = "action_left_heavy",
-                chain_time = 0.56
             },
             special_action = {
                 action_name = "action_parry_special",
-                chain_time = 0.5
+            }
+        }
+    },
+    ["action_melee_start_right_2"] = {
+        name = "action_melee_start_right_2",
+        kind = "windup",
+        allowed_chain_actions = {
+            light_attack = {
+                action_name = "action_right_light",
+            },
+            heavy_attack = {
+                action_name = "action_right_heavy_2",
+            },
+            special_action = {
+                action_name = "action_parry_special",
+            }
+        }
+    },
+    ["action_melee_start_push_combo"] = {
+        name = "action_melee_start_push_combo",
+        kind = "windup",
+        allowed_chain_actions = {
+            light_attack = {
+                action_name = "action_left_light_2",
+            },
+            heavy_attack = {
+                action_name = "action_left_heavy",
+            },
+            special_action = {
+                action_name = "action_parry_special",
             }
         }
     },
@@ -58,11 +81,9 @@ return {
         allowed_chain_actions = {
             start_attack = {
                 action_name = "action_melee_start_right",
-                chain_time = 0.4
             },
             special_action = {
                 action_name = "action_parry_special",
-                chain_time = 0.4
             }
         }
     },
@@ -72,11 +93,9 @@ return {
         allowed_chain_actions = {
             start_attack = {
                 action_name = "action_melee_start_right",
-                chain_time = 0.4
             },
             special_action = {
                 action_name = "action_parry_special",
-                chain_time = 0.4
             }
         }
     },
@@ -86,11 +105,9 @@ return {
         allowed_chain_actions = {
             start_attack = {
                 action_name = "action_melee_start_left_2",
-                chain_time = 0.6
             },
             special_action = {
                 action_name = "action_parry_special",
-                chain_time = 0.45
             }
         }
     },
@@ -100,11 +117,9 @@ return {
         allowed_chain_actions = {
             start_attack = {
                 action_name = "action_melee_start_left_2",
-                chain_time = 0.55
             },
             special_action = {
                 action_name = "action_parry_special",
-                chain_time = 0.5
             }
         }
     },
@@ -113,12 +128,22 @@ return {
         kind = "sweep",
         allowed_chain_actions = {
             start_attack = {
-                action_name = "action_melee_start_left",
-                chain_time = 0.5
+                action_name = "action_melee_start_right_2",
             },
             special_action = {
                 action_name = "action_parry_special",
-                chain_time = 0.48
+            }
+        }
+    },
+    ["action_right_heavy_2"] = {
+        name = "action_right_heavy_2",
+        kind = "sweep",
+        allowed_chain_actions = {
+            start_attack = {
+                action_name = "action_melee_start_left",
+            },
+            special_action = {
+                action_name = "action_parry_special",
             }
         }
     },
@@ -128,11 +153,9 @@ return {
         allowed_chain_actions = {
 			start_attack = {
 				action_name = "action_melee_start_left_2",
-				chain_time = 0.4
 			},
 			special_action = {
 				action_name = "action_parry_special",
-				chain_time = 0.45
 			}
         }
     },
@@ -142,15 +165,12 @@ return {
         allowed_chain_actions = {
             push_follow_up = {
 				action_name = "action_right_light_pushfollow",
-				chain_time = 0.25
 			},
             start_attack = {
-                action_name = "action_melee_start_left",
-                chain_time = 0.35
+                action_name = "action_melee_start_push_combo",
             },
             special_action = {
                 action_name = "action_parry_special",
-                chain_time = 0.3
             }
         }
     },
@@ -160,15 +180,12 @@ return {
         allowed_chain_actions = {
             parry = {
                 action_name = "action_attack_special",
-                chain_time = 0.25
             },
             start_attack = {
                 action_name = "action_melee_start_left",
-                chain_time = 0.2
             },
             special_action = {
                 action_name = "action_parry_special",
-                chain_time = 1.25
             }
         }
     },
@@ -178,11 +195,9 @@ return {
         allowed_chain_actions = {
             start_attack = {
                 action_name = "action_melee_start_left_2",
-                chain_time = 0.4
             },
             special_action = {
                 action_name = "action_parry_special",
-                chain_time = 0.45
             }
         }
     }
