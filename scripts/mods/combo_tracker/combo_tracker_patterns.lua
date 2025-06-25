@@ -81,8 +81,6 @@ return {
     [weapon .. "powermaul_p1_m1"] = mod:io_dofile(path .. "power_mauls/combo_tracker_powermaul_p1_m1"),
     -- Indignatus Mk III Shock Maul
     [weapon .. "powermaul_p1_m2"] = mod:io_dofile(path .. "power_mauls/combo_tracker_powermaul_p1_m2"),
-    -- Unadded Power Maul (m3)
-    [weapon .. "powermaul_p1_m3"] = mod:io_dofile(path .. "power_mauls/combo_tracker_powermaul_p1_m3"),
     -- Indignatus Mk IVe Crusher
     [weapon .. "powermaul_2h_p1_m1"] = mod:io_dofile(path .. "power_mauls_2h/combo_tracker_powermaul_2h_p1_m1"),
     -- Crucis Mk II Thunder Hammer
@@ -121,4 +119,12 @@ return {
     [weapon .. "ogryn_powermaul_p1_m3"] = mod:io_dofile(path .. "ogryn_power_mauls/combo_tracker_ogryn_powermaul_p1_m3"),
     -- Orox Mk II Battle Maul & Mk III Slab Shield
     [weapon .. "ogryn_powermaul_slabshield_p1_m1"] = mod:io_dofile(path .. "ogryn_powermaul_slabshield/combo_tracker_ogryn_powermaul_slabshield_p1_m1"),
+    -- Branx Mk III Arbites Shock Maul
+    [weapon .. "powermaul_p2_m1"] = mod:io_dofile(path .. "power_mauls/combo_tracker_powermaul_p2_m1"),
+    -- Unnamed Arbites powermaul (m2)
+    [weapon .. "powermaul_p2_m2"] = mod:io_dofile(path .. "power_mauls/combo_tracker_powermaul_p2_m2"),
+    -- Branx Mk VI Shock Maul and Suppression Shield
+    [weapon .. "powermaul_shield_p1_m1"] = mod:io_dofile(path .. "power_maul_shields/combo_tracker_powermaul_shield_p1_m1"),
+    -- Branx Mk XI Shock Maul and Suppression Shield
+    [weapon .. "powermaul_shield_p1_m2"] = mod:io_dofile(path .. "power_maul_shields/combo_tracker_powermaul_shield_p1_m2"),
 }

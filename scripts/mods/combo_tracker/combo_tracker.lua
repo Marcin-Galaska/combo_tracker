@@ -320,6 +320,10 @@ local _handle_weapon_pattern = function(weapon_actions, primary_attack_chain_len
 end
 
 local _handle_next_attacks = function(current_action, is_foldable_shovel, is_foldable_shovel_folded)
+    if mod._weapon_actions == nil then
+        return
+    end
+
     if not mod._weapon_actions[current_action] then
         current_action = mod._weapon_actions["default"]
     end
@@ -410,6 +414,10 @@ mod:hook_safe("PlayerUnitWeaponExtension", "on_slot_wielded", function(self, slo
     mod._weapon_name = weapon_item.name
     mod._weapon_actions = Patterns[mod._weapon_name]
 
+    if mod._weapon_actions == nil then
+        return
+    end
+
     -- Handle foldable shovels
     if mod._weapon_actions["is_foldable_shovel"] and mod._weapon_actions["is_foldable_shovel"] == true then
         mod._is_foldable_shovel = true
@@ -457,6 +465,10 @@ end)
 -- Reset current action
 mod:hook_safe("ActionHandler", "_finish_action", function(self, handler_data, reason, data, t, next_action_params)
     if not mod._is_melee then
+        return
+    end
+
+    if mod._weapon_actions == nil then
         return
     end
 

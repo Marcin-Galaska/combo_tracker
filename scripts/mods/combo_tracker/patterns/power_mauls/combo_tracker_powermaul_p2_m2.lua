@@ -9,10 +9,6 @@ return {
 			},
 			heavy_attack = {
 				action_name = "action_left_heavy",
-				chain_time = 0.45
-			},
-			special_action = {
-				action_name = "action_special_action"
 			}
         }
     },
@@ -24,11 +20,7 @@ return {
 				action_name = "action_right_light"
 			},
 			heavy_attack = {
-				action_name = "action_right_heavy",
-				chain_time = 0.51
-			},
-			special_action = {
-				action_name = "action_special_action"
+				action_name = "action_heavy_2",
 			}
         }
     },
@@ -40,11 +32,19 @@ return {
 				action_name = "action_left_light_2"
 			},
 			heavy_attack = {
-				action_name = "action_left_heavy",
-				chain_time = 0.45
+				action_name = "action_heavy_3",
+			}
+        }
+    },
+	["action_melee_start_right_2"] = {
+        name = "action_melee_start_right_2",
+        kind = "windup",
+        allowed_chain_actions = {
+			light_attack = {
+				action_name = "action_light_4"
 			},
-			special_action = {
-				action_name = "action_special_action"
+			heavy_attack = {
+				action_name = "action_heavy_2",
 			}
         }
     },
@@ -54,11 +54,9 @@ return {
         allowed_chain_actions = {
 			start_attack = {
 				action_name = "action_melee_start_right",
-				chain_time = 0.57
 			},
 			special_action = {
 				action_name = "action_special_action",
-				chain_time = 0.63
 			}
         }
     },
@@ -67,12 +65,10 @@ return {
         kind = "sweep",
         allowed_chain_actions = {
 			start_attack = {
-				action_name = "action_melee_start_right",
-				chain_time = 0.58
+				action_name = "action_melee_start_right_2",
 			},
 			special_action = {
 				action_name = "action_special_action",
-				chain_time = 0.63
 			}
         }
     },
@@ -82,25 +78,21 @@ return {
         allowed_chain_actions = {
 			start_attack = {
 				action_name = "action_melee_start_left_2",
-				chain_time = 0.63
 			},
 			special_action = {
 				action_name = "action_special_action",
-				chain_time = 0.65
 			}
         }
     },
-    ["action_right_heavy"] = {
-        name = "action_right_heavy",
+    ["action_heavy_2"] = {
+        name = "action_heavy_2",
         kind = "sweep",
         allowed_chain_actions = {
 			start_attack = {
-				action_name = "action_melee_start_left",
-				chain_time = 0.6
+				action_name = "action_melee_start_left_2",
 			},
 			special_action = {
 				action_name = "action_special_action",
-				chain_time = 0.7
 			}
         }
     },
@@ -109,12 +101,34 @@ return {
         kind = "sweep",
         allowed_chain_actions = {
 			start_attack = {
-				action_name = "action_melee_start_left",
-				chain_time = 0.66
+				action_name = "action_melee_start_right_2",
 			},
 			special_action = {
 				action_name = "action_special_action",
-				chain_time = 0.75
+			}
+        }
+    },
+	["action_heavy_3"] = {
+        name = "action_heavy_3",
+        kind = "sweep",
+        allowed_chain_actions = {
+			start_attack = {
+				action_name = "action_melee_start_right",
+			},
+			special_action = {
+				action_name = "action_special_action",
+			}
+        }
+    },
+	["action_light_4"] = {
+        name = "action_light_4",
+        kind = "sweep",
+        allowed_chain_actions = {
+			start_attack = {
+				action_name = "action_melee_start_left",
+			},
+			special_action = {
+				action_name = "action_special_action",
 			}
         }
     },
@@ -123,26 +137,10 @@ return {
         kind = "sweep",
         allowed_chain_actions = {
 			start_attack = {
-				action_name = "action_melee_start_left_2",
-				chain_time = 0.5
+				action_name = "action_melee_start_right_2",
 			},
 			special_action = {
 				action_name = "action_special_action",
-				chain_time = 0.35
-			}
-        }
-    },
-    ["action_push"] = {
-        anem = "action_push",
-        kind = "push",
-        allowed_chain_actions = {
-			push_follow_up = {
-				action_name = "action_right_light_pushfollow",
-				chain_time = 0.25
-			},
-			start_attack = {
-				action_name = "action_melee_start_left",
-				chain_time = 0.45
 			}
         }
     },
@@ -152,11 +150,21 @@ return {
         allowed_chain_actions = {
 			start_attack = {
 				action_name = "action_melee_start_right",
-				chain_time = 1.3
 			},
 			special_action = {
 				action_name = "action_special_action",
-				chain_time = 1
+			}
+        }
+    },
+	["action_push"] = {
+        name = "action_push",
+        kind = "sweep",
+        allowed_chain_actions = {
+			push_follow_up = {
+				action_name = "action_right_light_pushfollow",
+			},
+			start_attack = {
+				action_name = "action_melee_start_right",
 			}
         }
     }
