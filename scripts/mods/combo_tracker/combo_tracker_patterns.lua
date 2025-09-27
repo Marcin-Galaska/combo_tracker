@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 2.0.8
+-- Combo Tracker mod by mroużon. Ver. 2.0.9
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -29,6 +29,10 @@ return {
     [weapon .. "powersword_p1_m1"] = mod:io_dofile(path .. "power_swords/combo_tracker_powersword_p1_m1"),
     -- Munitorum Mk VI Power Sword
     [weapon .. "powersword_p1_m2"] = mod:io_dofile(path .. "power_swords/combo_tracker_powersword_p1_m2"),
+    -- Aridin Mk I Power Falchion
+    [weapon .. "powersword_p2_m1"] = mod:io_dofile(path .. "power_swords/combo_tracker_powersword_p2_m1"),
+    -- Lawbringer Mk IIb Power Falchion
+    [weapon .. "powersword_p2_m2"] = mod:io_dofile(path .. "power_swords/combo_tracker_powersword_p2_m2"),
     -- Munitorum Mk X Relic Blade
     [weapon .. "powersword_2h_p1_m1"] = mod:io_dofile(path .. "power_swords_2h/combo_tracker_powersword_2h_p1_m1"),
     -- Munitorum Mk II Relic Blade
