@@ -1,4 +1,4 @@
--- Combo Tracker mod by mroużon. Ver. 2.0.9
+-- Combo Tracker mod by mroużon. Ver. 2.0.10
 -- Thanks to Zombine, Redbeardt and others for their input into the community. Their work helped me a lot in the process of creating this mod.
 
 local mod = get_mod("combo_tracker")
@@ -131,4 +131,12 @@ return {
     [weapon .. "powermaul_shield_p1_m1"] = mod:io_dofile(path .. "power_maul_shields/combo_tracker_powermaul_shield_p1_m1"),
     -- Branx Mk XI Shock Maul and Suppression Shield
     [weapon .. "powermaul_shield_p1_m2"] = mod:io_dofile(path .. "power_maul_shields/combo_tracker_powermaul_shield_p1_m2"),
+    -- Enginseer's Mk VI
+    [weapon .. "crowbar_p1_m1"] = mod:io_dofile(path .. "crowbars/combo_tracker_crowbar_p1_m1"),
+    -- Improvised Mk III
+    [weapon .. "dual_shivs_p1_m1"] = mod:io_dofile(path .. "dual_shivs/combo_tracker_dual_shivs_p1_m1"),
+    -- Improvied Mk I
+    [weapon .. "dual_shivs_p1_m2"] = mod:io_dofile(path .. "dual_shivs/combo_tracker_dual_shivs_p1_m2"),
+    -- Chirurgeon's Mk IV
+    [weapon .. "saw_p1_m1"] = mod:io_dofile(path .. "saws/combo_tracker_saw_p1_m1"),
 }
